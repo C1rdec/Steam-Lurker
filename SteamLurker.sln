@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32811.315
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamLurker", "src\SteamLurker\SteamLurker.csproj", "{11EE5687-EE62-4E55-8B27-ABF337E70760}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamLurker.UI", "src\SteamLurker.UI\SteamLurker.UI.csproj", "{DCDEE9BC-981F-45AA-B2C6-A359ABDFC1CB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{11EE5687-EE62-4E55-8B27-ABF337E70760}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11EE5687-EE62-4E55-8B27-ABF337E70760}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11EE5687-EE62-4E55-8B27-ABF337E70760}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11EE5687-EE62-4E55-8B27-ABF337E70760}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCDEE9BC-981F-45AA-B2C6-A359ABDFC1CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCDEE9BC-981F-45AA-B2C6-A359ABDFC1CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCDEE9BC-981F-45AA-B2C6-A359ABDFC1CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCDEE9BC-981F-45AA-B2C6-A359ABDFC1CB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {96CD87D9-205A-40F5-9878-D2EFB7EE9F7A}
+	EndGlobalSection
+EndGlobal
