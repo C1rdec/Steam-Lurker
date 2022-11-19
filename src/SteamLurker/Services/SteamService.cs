@@ -43,7 +43,7 @@ namespace SteamLurker.Services
                 return;
             }
 
-            var arguments = @".\Resources\OpenSteamLink.url";
+            var arguments = @".\steam.lurker\OpenSteamLink.url";
 
             var command = CliWrap.Cli
                             .Wrap("cmd.exe")
