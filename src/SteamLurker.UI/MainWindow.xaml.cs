@@ -22,14 +22,14 @@ namespace SteamLurker.UI
         {
             var service = new SteamService();
             await service.InitializeAsync();
-            var games = service.FindSteamGames();
+            var games = service.FindGames();
 
-            //var amoungUs = games.FirstOrDefault(g => g.Name == "Among Us");
-            //if (amoungUs != null)
-            //{
-            //    await amoungUs.Open();
-            //    Test.Source = BitmapToImageSource(amoungUs.GetIcon());
-            //}
+            var game = games.FirstOrDefault(g => g.Name == "The Flame in the Flood");
+            if (game != null)
+            {
+                await game.Open();
+                Test.Source = BitmapToImageSource(game.GetIcon());
+            }
         }
 
         BitmapImage BitmapToImageSource(Bitmap bitmap)

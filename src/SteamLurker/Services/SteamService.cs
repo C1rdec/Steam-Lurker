@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,6 +15,7 @@ namespace SteamLurker.Services
         #region Fields
 
         private static readonly string ProcessName = "steam";
+        private static readonly string SteamApps = "steamapps";
         private string _steamExecutable;
 
         #endregion
@@ -24,29 +24,13 @@ namespace SteamLurker.Services
 
         private string RootSteamFolderPath => Path.GetDirectoryName(_steamExecutable);
 
-        private string SteamAppsFolderPath => Path.Combine(RootSteamFolderPath, "steamapps");
+        private string SteamAppsFolderPath => Path.Combine(RootSteamFolderPath, SteamApps);
+
+        private string libraryFoldersFile => Path.Combine(SteamAppsFolderPath, "libraryfolders.vdf");
 
         #endregion
 
         #region Methods
-
-        public List<SteamGame> FindSteamGames()
-        {
-            if (string.IsNullOrEmpty(_steamExecutable))
-            {
-                throw new InvalidOperationException("Must be initialize");
-            }
-
-            var games = new List<SteamGame>();
-            var acfFiles = Directory.GetFiles(SteamAppsFolderPath, "*.acf");
-            foreach (var file in acfFiles)
-            {
-                games.Add(new SteamGame(file, _steamExecutable));
-            }
-
-            return games;
-        }
-
 
         public async Task InitializeAsync()
         {
@@ -71,6 +55,60 @@ namespace SteamLurker.Services
             _steamExecutable = process.GetMainModuleFileName();
 
             return;
+        }
+
+        public List<SteamGame> FindGames()
+        {
+            if (string.IsNullOrEmpty(_steamExecutable))
+            {
+                throw new InvalidOperationException("Must be initialize");
+            }
+
+            var games = new List<SteamGame>();
+            AddGames(SteamAppsFolderPath, games);
+
+            if (File.Exists(libraryFoldersFile))
+            {
+                var text = File.ReadAllText(libraryFoldersFile);
+                var index = 0;
+                var searchTerm = "\"path\"\t\t";
+                do
+                {
+                    var folderPath = text
+                        .GetLineAfter(searchTerm)
+                        .Replace("\"", string.Empty)
+                        .Replace("\\\\", "\\");
+
+                    if (string.IsNullOrEmpty(folderPath))
+                    {
+                        return games;
+                    }
+
+                    var steamApps = Path.Combine(folderPath, SteamApps);
+
+                    if (steamApps != SteamAppsFolderPath)
+                    {
+                        AddGames(steamApps, games);
+                    }
+
+                    index = text.IndexOf(searchTerm);
+                    if (index != -1)
+                    {
+                        text = text.Substring(index + searchTerm.Length);
+                    }
+                } while (index != -1);
+            }
+
+            return games;
+        }
+
+        private void AddGames(string folder, List<SteamGame> games)
+        {
+            var acfFiles = Directory.GetFiles(folder, "*.acf");
+            foreach (var file in acfFiles)
+            {
+                games.Add(new SteamGame(file, _steamExecutable));
+            }
         }
 
         #endregion

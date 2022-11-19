@@ -10,7 +10,7 @@ namespace SteamLurker.Extensions
             var index = value.IndexOf(marker);
             if (index == -1)
             {
-                return null;
+                return string.Empty;
             }
 
             var textAfter = value.Substring(index + marker.Length);
