@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,11 @@ namespace SteamLurker.Models
     {
         #region Fields
 
+        private static readonly Dictionary<string, string> Alias = new() 
+        { 
+            { "1938090", "cod" },
+            { "488310", "pong" },
+        };
         private string _steamExe;
         private string _folderPath;
         private string _exeFilePath;
@@ -32,10 +38,16 @@ namespace SteamLurker.Models
             _folderPath = Path.Combine(Path.GetDirectoryName(acfFilePath), "common", installationFolder);
             var exeFiles = new DirectoryInfo(_folderPath).GetFiles($"*.exe", SearchOption.AllDirectories);
 
+            var searchTerm = Name;
+            if (Alias.TryGetValue(Id, out var alias))
+            {
+                searchTerm = alias;
+            }
+
             var matches = exeFiles.Select(e => new 
             { 
                 FilePath = e.FullName,
-                Ratio = Fuzz.Ratio(e.Name.Replace(".exe", string.Empty).ToLower(), Name.ToLower()) 
+                Ratio = Fuzz.Ratio(e.Name.Replace(".exe", string.Empty).ToLower(), searchTerm.ToLower()) 
             });
 
             var bestmatch = matches.MaxBy(r => r.Ratio);

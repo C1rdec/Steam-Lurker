@@ -17,7 +17,7 @@ namespace SteamLurker.Services
         private static readonly string ProcessName = "steam";
         private static readonly string SteamApps = "steamapps";
         private string _steamExecutable;
-        private static List<string> SteamToolIds = new List<string> { "250820", "228980" };
+        private static List<string> SteamToolIds = new() { "250820", "228980" };
 
         #endregion
 
@@ -33,29 +33,34 @@ namespace SteamLurker.Services
 
         #region Methods
 
-        public async Task InitializeAsync()
+        public async Task InitializeAsync(string steamExe = null)
         {
-            var runningSteamProcess = Process.GetProcessesByName(ProcessName);
-            if (runningSteamProcess.Any())
+            if (!string.IsNullOrEmpty(steamExe) && File.Exists(steamExe))
             {
-                _steamExecutable = runningSteamProcess[0].GetMainModuleFileName();
-
-                return;
+                _steamExecutable = steamExe;
             }
+            else
+            {
+                var runningSteamProcess = Process.GetProcessesByName(ProcessName);
+                if (runningSteamProcess.Any())
+                {
+                    _steamExecutable = runningSteamProcess[0].GetMainModuleFileName();
 
-            var arguments = @".\steam.lurker\OpenSteamLink.url";
+                    return;
+                }
 
-            var command = CliWrap.Cli
-                            .Wrap("cmd.exe")
-                            .WithArguments($"/C {arguments}");
-            await command.ExecuteAsync();
+                var arguments = @".\steam.lurker\OpenSteamLink.url";
 
-            var processService = new ProcessService(ProcessName);
-            var processId = await processService.WaitForProcess(false);
-            var process = Process.GetProcessById(processId);
-            _steamExecutable = process.GetMainModuleFileName();
+                var command = CliWrap.Cli
+                                .Wrap("cmd.exe")
+                                .WithArguments($"/C {arguments}");
+                await command.ExecuteAsync();
 
-            return;
+                var processService = new ProcessService(ProcessName);
+                var processId = await processService.WaitForProcess(false);
+                var process = Process.GetProcessById(processId);
+                _steamExecutable = process.GetMainModuleFileName();
+            }
         }
 
         public List<SteamGame> FindGames()
