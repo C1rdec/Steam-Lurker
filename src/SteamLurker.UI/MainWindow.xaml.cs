@@ -27,7 +27,6 @@ namespace SteamLurker.UI
             var game = games.FirstOrDefault(g => g.Name == "The Flame in the Flood");
             if (game != null)
             {
-                await game.Open();
                 Test.Source = BitmapToImageSource(game.GetIcon());
             }
         }

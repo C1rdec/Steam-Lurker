@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using FuzzySharp;
 using SteamLurker.Extensions;
 
 namespace SteamLurker.Models
@@ -12,7 +13,7 @@ namespace SteamLurker.Models
 
         private string _steamExe;
         private string _folderPath;
-        private FileInfo[] _exeFilePath;
+        private string _exeFilePath;
 
         #endregion
 
@@ -29,7 +30,16 @@ namespace SteamLurker.Models
 
             _steamExe = steamExe;
             _folderPath = Path.Combine(Path.GetDirectoryName(acfFilePath), "common", installationFolder);
-            _exeFilePath = new DirectoryInfo(_folderPath).GetFiles($"*.exe", SearchOption.AllDirectories);
+            var exeFiles = new DirectoryInfo(_folderPath).GetFiles($"*.exe", SearchOption.AllDirectories);
+
+            var matches = exeFiles.Select(e => new 
+            { 
+                FilePath = e.FullName,
+                Ratio = Fuzz.Ratio(e.Name.Replace(".exe", string.Empty).ToLower(), Name.ToLower()) 
+            });
+
+            var bestmatch = matches.MaxBy(r => r.Ratio);
+            _exeFilePath = bestmatch.FilePath;
         }
 
         #endregion
@@ -53,8 +63,7 @@ namespace SteamLurker.Models
 
             try
             {
-                var exeFile = _exeFilePath.FirstOrDefault();
-                result = Icon.ExtractAssociatedIcon(exeFile.FullName);
+                result = Icon.ExtractAssociatedIcon(_exeFilePath);
             }
             catch (System.Exception)
             {

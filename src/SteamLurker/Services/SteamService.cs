@@ -17,6 +17,7 @@ namespace SteamLurker.Services
         private static readonly string ProcessName = "steam";
         private static readonly string SteamApps = "steamapps";
         private string _steamExecutable;
+        private static List<string> SteamToolIds = new List<string> { "250820", "228980" };
 
         #endregion
 
@@ -105,9 +106,18 @@ namespace SteamLurker.Services
         private void AddGames(string folder, List<SteamGame> games)
         {
             var acfFiles = Directory.GetFiles(folder, "*.acf");
-            foreach (var file in acfFiles)
+            foreach (var filePath in acfFiles)
             {
-                games.Add(new SteamGame(file, _steamExecutable));
+                var game = new SteamGame(filePath, _steamExecutable);
+
+                // Steamworks Common Redistributables
+                // SteamVR
+                if (SteamToolIds.Contains(game.Id))
+                {
+                    continue;
+                }
+
+                games.Add(game);
             }
         }
 
