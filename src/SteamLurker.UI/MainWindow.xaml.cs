@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using SteamLurker.Services;
@@ -14,10 +15,21 @@ namespace SteamLurker.UI
         public MainWindow()
         {
             InitializeComponent();
+            Loaded += MainWindow_Loaded;
+        }
 
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
             var service = new SteamService();
+            await service.InitializeAsync();
+            var games = service.FindSteamGames();
 
-            Test.Source = BitmapToImageSource(service.GetIcon() as Bitmap);
+            //var amoungUs = games.FirstOrDefault(g => g.Name == "Among Us");
+            //if (amoungUs != null)
+            //{
+            //    await amoungUs.Open();
+            //    Test.Source = BitmapToImageSource(amoungUs.GetIcon());
+            //}
         }
 
         BitmapImage BitmapToImageSource(Bitmap bitmap)

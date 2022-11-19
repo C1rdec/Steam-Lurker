@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using ProcessLurker;
 using SteamLurker.Extensions;
 using SteamLurker.Models;
 
@@ -11,75 +15,62 @@ namespace SteamLurker.Services
     {
         #region Fields
 
+        private static readonly string ProcessName = "steam";
         private string _steamExecutable;
-        private List<SteamGame> _games;
-
-        #endregion
-
-        #region Constructors
-
-        public SteamService()
-        {
-            _steamExecutable = FindSteamExe();
-            _games = FindSteamGames();
-        }
 
         #endregion
 
         #region Properties
 
-        public string RootSteamFolderPath => Path.GetDirectoryName(_steamExecutable);
+        private string RootSteamFolderPath => Path.GetDirectoryName(_steamExecutable);
 
-        public string SteamAppsFolderPath => Path.Combine(RootSteamFolderPath, "steamapps");
+        private string SteamAppsFolderPath => Path.Combine(RootSteamFolderPath, "steamapps");
 
         #endregion
 
         #region Methods
 
-        public object GetIcon()
+        public List<SteamGame> FindSteamGames()
         {
-            var icon = Icon.ExtractAssociatedIcon(@"C:\Program Files (x86)\Steam\steamapps\common\Among Us\Among Us.exe");
-            return icon.ToBitmap();
-        }
-
-        private string FindSteamExe()
-        {
-            var runningSteamProcess = Process.GetProcessesByName("steam");
-            if (runningSteamProcess.Length > 0)
+            if (string.IsNullOrEmpty(_steamExecutable))
             {
-                return runningSteamProcess[0].GetMainModuleFileName();
+                throw new InvalidOperationException("Must be initialize");
             }
 
-            // Check Program Files
-            return "";
-        }
-
-        private List<SteamGame> FindSteamGames()
-        {
             var games = new List<SteamGame>();
             var acfFiles = Directory.GetFiles(SteamAppsFolderPath, "*.acf");
-            foreach(var file in acfFiles)
+            foreach (var file in acfFiles)
             {
-                games.Add(new SteamGame(file));
+                games.Add(new SteamGame(file, _steamExecutable));
             }
 
             return games;
         }
 
-        public static Icon IconFromFilePath(string filePath)
+
+        public async Task InitializeAsync()
         {
-            var result = (Icon)null;
+            var runningSteamProcess = Process.GetProcessesByName(ProcessName);
+            if (runningSteamProcess.Any())
+            {
+                _steamExecutable = runningSteamProcess[0].GetMainModuleFileName();
 
-            try
-            {
-                result = Icon.ExtractAssociatedIcon(filePath);
-            }
-            catch (System.Exception)
-            {
-                // swallow and return nothing. You could supply a default Icon here as well
+                return;
             }
 
-            return result;
+            var arguments = @".\Resources\OpenSteamLink.url";
+
+            var command = CliWrap.Cli
+                            .Wrap("cmd.exe")
+                            .WithArguments($"/C {arguments}");
+            await command.ExecuteAsync();
+
+            var processService = new ProcessService(ProcessName);
+            var processId = await processService.WaitForProcess(false);
+            var process = Process.GetProcessById(processId);
+            _steamExecutable = process.GetMainModuleFileName();
+
+            return;
         }
 
         #endregion
