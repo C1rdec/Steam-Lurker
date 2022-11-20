@@ -33,7 +33,7 @@ namespace SteamLurker.Services
 
         #region Methods
 
-        public async Task InitializeAsync(string steamExe = null)
+        public async Task<string> InitializeAsync(string steamExe = null)
         {
             if (!string.IsNullOrEmpty(steamExe) && File.Exists(steamExe))
             {
@@ -45,22 +45,25 @@ namespace SteamLurker.Services
                 if (runningSteamProcess.Any())
                 {
                     _steamExecutable = runningSteamProcess[0].GetMainModuleFileName();
-
-                    return;
                 }
+                else
+                {
+                    // Launch Steam to get the Process
+                    var arguments = @".\steam.lurker\OpenSteamLink.url";
 
-                var arguments = @".\steam.lurker\OpenSteamLink.url";
+                    var command = CliWrap.Cli
+                                    .Wrap("cmd.exe")
+                                    .WithArguments($"/C {arguments}");
+                    await command.ExecuteAsync();
 
-                var command = CliWrap.Cli
-                                .Wrap("cmd.exe")
-                                .WithArguments($"/C {arguments}");
-                await command.ExecuteAsync();
-
-                var processService = new ProcessService(ProcessName);
-                var processId = await processService.WaitForProcess(false);
-                var process = Process.GetProcessById(processId);
-                _steamExecutable = process.GetMainModuleFileName();
+                    var processService = new ProcessService(ProcessName);
+                    var processId = await processService.WaitForProcess(false);
+                    var process = Process.GetProcessById(processId);
+                    _steamExecutable = process.GetMainModuleFileName();
+                }
             }
+
+            return _steamExecutable;
         }
 
         public List<SteamGame> FindGames()
