@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using FuzzySharp;
 using Lurker.Common.Extensions;
 using Lurker.Common.Models;
 
@@ -12,11 +10,6 @@ namespace Lurker.Steam.Models
     {
         #region Fields
 
-        private static readonly Dictionary<string, string> Alias = new() 
-        { 
-            { "1938090", "cod" },
-            { "488310", "pong" },
-        };
         private string _steamExe;
         private string _acfFilePath;
         private string _id;
@@ -39,6 +32,12 @@ namespace Lurker.Steam.Models
 
         public override LauncherType Launcher => LauncherType.Steam;
 
+        public override Dictionary<string, string> Alias => new()
+        {
+            { "1938090", "cod" },
+            { "488310", "pong" },
+        };
+
         #endregion
 
         #region Methods
@@ -56,22 +55,8 @@ namespace Lurker.Steam.Models
             var installationFolder = text.GetLineAfter("\"installdir\"	").Replace("\"", string.Empty);
 
             var gameFolder = Path.Combine(Path.GetDirectoryName(_acfFilePath), "common", installationFolder);
-            var exeFiles = new DirectoryInfo(gameFolder).GetFiles($"*.exe", SearchOption.AllDirectories);
-
-            var searchTerm = Name;
-            if (Alias.TryGetValue(Id, out var alias))
-            {
-                searchTerm = alias;
-            }
-
-            var matches = exeFiles.Select(e => new
-            {
-                FilePath = e.FullName,
-                Ratio = Fuzz.Ratio(e.Name.Replace(".exe", string.Empty).ToLower(), searchTerm.ToLower())
-            });
-
-            var bestmatch = matches.MaxBy(r => r.Ratio);
-            ExeFilePath = bestmatch.FilePath;
+            
+            SetExeFile(gameFolder);
         }
 
         #endregion
