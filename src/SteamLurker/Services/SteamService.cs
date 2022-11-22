@@ -20,13 +20,13 @@ namespace Lurker.Steam.Services
 
         protected override string ProcessName => "steam";
 
-        protected override string OpenLink => throw new NotImplementedException();
+        protected override string OpenLink => @".\steam.lurker\OpenSteamLink.url";
 
         private string RootSteamFolderPath => Path.GetDirectoryName(ExecutablePath);
 
         private string SteamAppsFolderPath => Path.Combine(RootSteamFolderPath, SteamApps);
 
-        private string libraryFoldersFile => Path.Combine(SteamAppsFolderPath, "libraryfolders.vdf");
+        private string LibraryFoldersFile => Path.Combine(SteamAppsFolderPath, "libraryfolders.vdf");
 
         #endregion
 
@@ -42,9 +42,9 @@ namespace Lurker.Steam.Services
             var games = new List<SteamGame>();
             AddGames(SteamAppsFolderPath, games);
 
-            if (File.Exists(libraryFoldersFile))
+            if (File.Exists(LibraryFoldersFile))
             {
-                var text = File.ReadAllText(libraryFoldersFile);
+                var text = File.ReadAllText(LibraryFoldersFile);
                 var searchTerm = "\"path\"\t\t";
                 int index;
 
