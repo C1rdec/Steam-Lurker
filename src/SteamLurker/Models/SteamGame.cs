@@ -19,6 +19,7 @@ namespace Lurker.Steam.Models
         };
         private string _steamExe;
         private string _acfFilePath;
+        private string _id;
 
         #endregion
 
@@ -34,7 +35,7 @@ namespace Lurker.Steam.Models
 
         #region Properties
 
-        public string Id { get; set; }
+        public override string Id => _id;
 
         public override LauncherType Launcher => LauncherType.Steam;
 
@@ -49,7 +50,7 @@ namespace Lurker.Steam.Models
         {
             var text = File.ReadAllText(_acfFilePath);
 
-            Id = text.GetLineAfter("\"appid\"	").Replace("\"", string.Empty);
+            _id = text.GetLineAfter("\"appid\"	").Replace("\"", string.Empty);
             Name = text.GetLineAfter("\"name\"	").Replace("\"", string.Empty);
 
             var installationFolder = text.GetLineAfter("\"installdir\"	").Replace("\"", string.Empty);
