@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FuzzySharp;
-using SteamLurker.Extensions;
+using Lurker.Common.Extensions;
+using Lurker.Common.Models;
 
-namespace SteamLurker.Models
+namespace Lurker.Steam.Models
 {
-    public class SteamGame
+    public class SteamGame : GameBase
     {
         #region Fields
 
@@ -18,8 +18,7 @@ namespace SteamLurker.Models
             { "488310", "pong" },
         };
         private string _steamExe;
-        private string _folderPath;
-        private string _exeFilePath;
+        private string _acfFilePath;
 
         #endregion
 
@@ -27,16 +26,36 @@ namespace SteamLurker.Models
 
         public SteamGame(string acfFilePath, string steamExe)
         {
-            var text = File.ReadAllText(acfFilePath);
+            _steamExe = steamExe;
+            _acfFilePath = acfFilePath;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public string Id { get; set; }
+
+        public override LauncherType Launcher => LauncherType.Steam;
+
+        #endregion
+
+        #region Methods
+
+        public override Task Open()
+            => CliWrap.Cli.Wrap(_steamExe).WithArguments($"steam://rungameid/{Id}/").ExecuteAsync();
+
+        public override void Initialize()
+        {
+            var text = File.ReadAllText(_acfFilePath);
 
             Id = text.GetLineAfter("\"appid\"	").Replace("\"", string.Empty);
             Name = text.GetLineAfter("\"name\"	").Replace("\"", string.Empty);
 
             var installationFolder = text.GetLineAfter("\"installdir\"	").Replace("\"", string.Empty);
 
-            _steamExe = steamExe;
-            _folderPath = Path.Combine(Path.GetDirectoryName(acfFilePath), "common", installationFolder);
-            var exeFiles = new DirectoryInfo(_folderPath).GetFiles($"*.exe", SearchOption.AllDirectories);
+            var gameFolder = Path.Combine(Path.GetDirectoryName(_acfFilePath), "common", installationFolder);
+            var exeFiles = new DirectoryInfo(gameFolder).GetFiles($"*.exe", SearchOption.AllDirectories);
 
             var searchTerm = Name;
             if (Alias.TryGetValue(Id, out var alias))
@@ -44,45 +63,14 @@ namespace SteamLurker.Models
                 searchTerm = alias;
             }
 
-            var matches = exeFiles.Select(e => new 
-            { 
+            var matches = exeFiles.Select(e => new
+            {
                 FilePath = e.FullName,
-                Ratio = Fuzz.Ratio(e.Name.Replace(".exe", string.Empty).ToLower(), searchTerm.ToLower()) 
+                Ratio = Fuzz.Ratio(e.Name.Replace(".exe", string.Empty).ToLower(), searchTerm.ToLower())
             });
 
             var bestmatch = matches.MaxBy(r => r.Ratio);
-            _exeFilePath = bestmatch.FilePath;
-        }
-
-        #endregion
-
-        #region Properties
-
-        public string Name { get; set; }
-
-        public string Id { get; set; }
-
-        #endregion
-
-        #region Methods
-
-        public Task Open()
-            => CliWrap.Cli.Wrap(_steamExe).WithArguments($"steam://rungameid/{Id}/").ExecuteAsync();
-
-        public Bitmap GetIcon()
-        {
-            var result = (Icon)null;
-
-            try
-            {
-                result = Icon.ExtractAssociatedIcon(_exeFilePath);
-            }
-            catch (System.Exception)
-            {
-                // Set Default Icon
-            }
-
-            return result.ToBitmap();
+            ExeFilePath = bestmatch.FilePath;
         }
 
         #endregion

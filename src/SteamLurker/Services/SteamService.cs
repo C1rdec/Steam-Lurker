@@ -1,29 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using ProcessLurker;
-using SteamLurker.Extensions;
-using SteamLurker.Models;
+using Lurker.Common.Extensions;
+using Lurker.Common.Services;
+using Lurker.Steam.Models;
 
-namespace SteamLurker.Services
+namespace Lurker.Steam.Services
 {
-    public class SteamService
+    public class SteamService : ServiceBase<SteamGame>
     {
         #region Fields
 
-        private static readonly string ProcessName = "steam";
         private static readonly string SteamApps = "steamapps";
-        private string _steamExecutable;
         private static List<string> SteamToolIds = new() { "250820", "228980" };
 
         #endregion
 
         #region Properties
 
-        private string RootSteamFolderPath => Path.GetDirectoryName(_steamExecutable);
+        protected override string ProcessName => "steam";
+
+        protected override string OpenLink => throw new NotImplementedException();
+
+        private string RootSteamFolderPath => Path.GetDirectoryName(ExecutablePath);
 
         private string SteamAppsFolderPath => Path.Combine(RootSteamFolderPath, SteamApps);
 
@@ -33,42 +32,9 @@ namespace SteamLurker.Services
 
         #region Methods
 
-        public async Task<string> InitializeAsync(string steamExe = null)
+        public override List<SteamGame> FindGames()
         {
-            if (!string.IsNullOrEmpty(steamExe) && File.Exists(steamExe))
-            {
-                _steamExecutable = steamExe;
-            }
-            else
-            {
-                var runningSteamProcess = Process.GetProcessesByName(ProcessName);
-                if (runningSteamProcess.Any())
-                {
-                    _steamExecutable = runningSteamProcess[0].GetMainModuleFileName();
-                }
-                else
-                {
-                    // Launch Steam to get the Process
-                    var arguments = @".\steam.lurker\OpenSteamLink.url";
-
-                    var command = CliWrap.Cli
-                                    .Wrap("cmd.exe")
-                                    .WithArguments($"/C {arguments}");
-                    await command.ExecuteAsync();
-
-                    var processService = new ProcessService(ProcessName);
-                    var processId = await processService.WaitForProcess(false);
-                    var process = Process.GetProcessById(processId);
-                    _steamExecutable = process.GetMainModuleFileName();
-                }
-            }
-
-            return _steamExecutable;
-        }
-
-        public List<SteamGame> FindGames()
-        {
-            if (string.IsNullOrEmpty(_steamExecutable))
+            if (string.IsNullOrEmpty(ExecutablePath))
             {
                 throw new InvalidOperationException("Must be initialize");
             }
@@ -79,8 +45,9 @@ namespace SteamLurker.Services
             if (File.Exists(libraryFoldersFile))
             {
                 var text = File.ReadAllText(libraryFoldersFile);
-                var index = 0;
                 var searchTerm = "\"path\"\t\t";
+                int index;
+
                 do
                 {
                     var folderPath = text
@@ -116,7 +83,8 @@ namespace SteamLurker.Services
             var acfFiles = Directory.GetFiles(folder, "*.acf");
             foreach (var filePath in acfFiles)
             {
-                var game = new SteamGame(filePath, _steamExecutable);
+                var game = new SteamGame(filePath, ExecutablePath);
+                game.Initialize();
 
                 // Steamworks Common Redistributables
                 // SteamVR
