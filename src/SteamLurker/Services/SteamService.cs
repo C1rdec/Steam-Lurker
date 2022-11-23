@@ -20,7 +20,7 @@ namespace Lurker.Steam.Services
 
         protected override string ProcessName => "steam";
 
-        protected override string OpenLink => @".\steam.lurker\OpenSteamLink.url";
+        protected override string OpenLink => @"steam.lurker\OpenSteamLink.url";
 
         private string RootSteamFolderPath => Path.GetDirectoryName(ExecutablePath);
 
@@ -72,6 +72,7 @@ namespace Lurker.Steam.Services
                     {
                         text = text.Substring(index + searchTerm.Length);
                     }
+
                 } while (index != -1);
             }
 
@@ -86,8 +87,8 @@ namespace Lurker.Steam.Services
                 var game = new SteamGame(filePath, ExecutablePath);
                 game.Initialize();
 
-                // Steamworks Common Redistributables
                 // SteamVR
+                // Steamworks Common Redistributables
                 if (SteamToolIds.Contains(game.Id))
                 {
                     continue;
