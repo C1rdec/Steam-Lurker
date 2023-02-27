@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Lurker.Common.Extensions;
 using Lurker.Common.Services;
@@ -34,12 +33,12 @@ namespace Lurker.Steam.Services
 
         public override List<SteamGame> FindGames()
         {
+            var games = new List<SteamGame>();
             if (string.IsNullOrEmpty(ExecutablePath))
             {
-                throw new InvalidOperationException("Must be initialize");
+                return games;
             }
 
-            var games = new List<SteamGame>();
             AddGames(SteamAppsFolderPath, games);
 
             if (File.Exists(LibraryFoldersFile))

@@ -5,7 +5,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<Version>1.0.16</Version>
+	<Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lurker.Common" Version="1.0.5" />
+    <PackageReference Include="Lurker.Common" Version="1.1.0" />
   </ItemGroup>
 
 </Project>
