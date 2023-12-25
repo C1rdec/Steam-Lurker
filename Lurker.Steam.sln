@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lurker.Steam.Console", "Lurker.Steam.Console\Lurker.Steam.Console.csproj", "{63CFCFA0-D65E-4B2C-B869-8B58819754E9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{11EE5687-EE62-4E55-8B27-ABF337E70760}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11EE5687-EE62-4E55-8B27-ABF337E70760}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11EE5687-EE62-4E55-8B27-ABF337E70760}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63CFCFA0-D65E-4B2C-B869-8B58819754E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63CFCFA0-D65E-4B2C-B869-8B58819754E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63CFCFA0-D65E-4B2C-B869-8B58819754E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63CFCFA0-D65E-4B2C-B869-8B58819754E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -27,9 +27,27 @@ namespace Lurker.Steam.Services
 
         private string LibraryFoldersFile => Path.Combine(SteamAppsFolderPath, "libraryfolders.vdf");
 
+        private string UserConfigFilePath => Path.Combine(RootSteamFolderPath, "config", "loginusers.vdf");
+
         #endregion
 
         #region Methods
+
+        public string FindUsername()
+        {
+            var userConfigFilePath = UserConfigFilePath;
+            if (File.Exists(userConfigFilePath))
+            {
+                var text = File.ReadAllText(userConfigFilePath);
+                var searchTerm = "\"PersonaName\"\t\t";
+
+                var personaName = text.GetLineAfter(searchTerm);
+
+                return personaName.Substring(1, personaName.Length - 2);
+            }
+
+            return string.Empty;
+        }
 
         public override List<SteamGame> FindGames()
         {
