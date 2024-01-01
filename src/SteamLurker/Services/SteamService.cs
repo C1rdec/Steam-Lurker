@@ -19,7 +19,7 @@ namespace Lurker.Steam.Services
 
         protected override string ProcessName => "steam";
 
-        protected override string OpenLink => @"steam.lurker\OpenSteamLink.url";
+        protected override string OpenUrl => @"steam://nav/games";
 
         private string RootSteamFolderPath => Path.GetDirectoryName(ExecutablePath);
 

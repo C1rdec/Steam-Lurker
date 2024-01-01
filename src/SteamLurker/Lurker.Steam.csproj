@@ -5,21 +5,15 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<Version>1.1.0</Version>
+	<Version>8.0.1</Version>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="steam.lurker\OpenSteamLink.url">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lurker.Common" Version="1.1.0" />
+    <PackageReference Include="Lurker.Common" Version="8.0.0" />
   </ItemGroup>
 
 </Project>
