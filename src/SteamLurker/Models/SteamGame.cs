@@ -55,8 +55,10 @@ namespace Lurker.Steam.Models
             var installationFolder = text.GetLineAfter("\"installdir\"	").Replace("\"", string.Empty);
 
             var gameFolder = Path.Combine(Path.GetDirectoryName(_acfFilePath), "common", installationFolder);
-            
-            SetExeFile(gameFolder);
+            if (Directory.Exists(gameFolder))
+            {
+                SetExeFile(gameFolder);
+            }
         }
 
         #endregion
